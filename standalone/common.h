@@ -109,6 +109,14 @@ inline void yieldProcessor(u8 Count) {
   __asm__ __volatile__("" ::: "memory");
   for (u8 I = 0; I < Count; I++)
     __asm__ __volatile__("yield");
+#elif defined(__loongarch__)
+  __asm__ __volatile__("" ::: "memory");
+  //__loongarch___muldiv and loongarch/include/asm/vdso/processor.h
+  for (u8 I = 0; I < Count; I++) {
+    int dummy;
+	  /* In lieu of a halt instruction, induce a long-latency stall. */
+	  __asm__ __volatile__ ("div.w %0, %0, $zero" : "=r" (dummy));
+  }
 #endif
   __asm__ __volatile__("" ::: "memory");
 }
